@@ -108,6 +108,43 @@
           <p>React-based read-only dashboard with live charts, device selector, and time range filters.</p>
         </div>
       </div>
+
+      <h3>Live Services</h3>
+      <table>
+        <thead><tr><th>Service</th><th>URL</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Frontend App</td>
+            <td><a href="https://ioteagle.iotlab.am/login.html" target="_blank">ioteagle.iotlab.am</a></td>
+            <td>Main user-facing application — login, device management</td>
+          </tr>
+          <tr>
+            <td>IoT Dashboard</td>
+            <td><a href="https://dashboard.iotlab.am" target="_blank">dashboard.iotlab.am</a></td>
+            <td>Public read-only sensor data dashboard</td>
+          </tr>
+          <tr>
+            <td>HTTP→MQTT Bridge</td>
+            <td><a href="https://http.iotlab.am" target="_blank">http.iotlab.am</a></td>
+            <td>REST endpoint to publish MQTT messages (<code>/send-to-mqtt</code>, <code>/health</code>)</td>
+          </tr>
+          <tr>
+            <td>EMQX Broker</td>
+            <td><a href="https://emqx.iotlab.am" target="_blank">emqx.iotlab.am</a></td>
+            <td>MQTT broker — device connections on port 1883 / 8883 (TLS)</td>
+          </tr>
+          <tr>
+            <td>EMQX Dashboard</td>
+            <td><a href="https://emqx.iotlab.am/#/login" target="_blank">emqx.iotlab.am/#/login</a></td>
+            <td>Admin UI — monitor connections, topics, ACL rules</td>
+          </tr>
+          <tr>
+            <td>Documentation</td>
+            <td><a href="https://docs.iotlab.am" target="_blank">docs.iotlab.am</a></td>
+            <td>This page</td>
+          </tr>
+        </tbody>
+      </table>
     </section>
 
     <div class="divider"></div>
@@ -159,7 +196,7 @@
           <div class="arch-node client">
             <div class="arch-icon">🌐</div>
             <div class="arch-label">Browser</div>
-            <div class="arch-sub">dashboard.iotlab.am</div>
+            <div class="arch-sub">ioteagle / dashboard</div>
           </div>
         </div>
       </div>
@@ -171,13 +208,14 @@
         </thead>
         <tbody>
           <tr><td><code>main_api</code></td><td>main_api</td><td>5000</td><td>REST API (Flask + Gunicorn)</td></tr>
-          <tr><td><code>emqx</code></td><td>emqx</td><td>1883, 8083, 18083</td><td>MQTT broker + management UI</td></tr>
+          <tr><td><code>frontend</code></td><td>frontend</td><td>9090</td><td>Main app — <a href="https://ioteagle.iotlab.am" target="_blank">ioteagle.iotlab.am</a></td></tr>
+          <tr><td><code>emqx</code></td><td>emqx</td><td>1883, 8083, 8883, 18083</td><td>MQTT broker — <a href="https://emqx.iotlab.am" target="_blank">emqx.iotlab.am</a></td></tr>
           <tr><td><code>mongodb</code></td><td>docker-files-mongodb-1</td><td>27017</td><td>Database</td></tr>
           <tr><td><code>mqtt_to_mongo</code></td><td>mqtt_to_python</td><td>—</td><td>MQTT→MongoDB bridge</td></tr>
-          <tr><td><code>http-to-mqtt</code></td><td>http-to-mqtt-flask-app-1</td><td>7003</td><td>HTTP→MQTT bridge (Flask)</td></tr>
-          <tr><td><code>iot-dashboard</code></td><td>iot-dashboard</td><td>8080</td><td>React dashboard (nginx)</td></tr>
+          <tr><td><code>http-to-mqtt</code></td><td>http-to-mqtt-flask-app-1</td><td>7003</td><td>HTTP→MQTT — <a href="https://http.iotlab.am" target="_blank">http.iotlab.am</a></td></tr>
+          <tr><td><code>iot-dashboard</code></td><td>iot-dashboard</td><td>8080</td><td>Dashboard — <a href="https://dashboard.iotlab.am" target="_blank">dashboard.iotlab.am</a></td></tr>
           <tr><td><code>iot-simulator</code></td><td>iot-simulator</td><td>—</td><td>Test data generator</td></tr>
-          <tr><td><code>iot-docs</code></td><td>iot-docs</td><td>8090</td><td>This documentation</td></tr>
+          <tr><td><code>iot-docs</code></td><td>iot-docs</td><td>8090</td><td>Docs — <a href="https://docs.iotlab.am" target="_blank">docs.iotlab.am</a></td></tr>
         </tbody>
       </table>
 
@@ -202,7 +240,7 @@
           <div class="step-num">1</div>
           <div class="step-body">
             <h4>Create an account</h4>
-            <pre><code class="language-bash">curl -X POST https://api.iotlab.am/users/signup \
+            <pre><code class="language-bash">curl -X POST https://ioteagle.iotlab.am/users/signup \
   -H "Content-Type: application/json" \
   -d '{
     "username": "mydevice",
@@ -216,13 +254,13 @@
           <div class="step-body">
             <h4>Sign in &amp; register a device</h4>
             <pre><code class="language-bash"># Sign in
-SESSION=$(curl -s -X POST https://api.iotlab.am/users/signin \
+SESSION=$(curl -s -X POST https://ioteagle.iotlab.am/users/signin \
   -H "Content-Type: application/json" \
   -d '{"username":"mydevice","password":"securepass"}' \
   | jq -r '.session')
 
 # Add device
-curl -X POST https://api.iotlab.am/devices/add \
+curl -X POST https://ioteagle.iotlab.am/devices/add \
   -H "Content-Type: application/json" \
   -d "{
     \"user_session\": \"$SESSION\",
@@ -244,7 +282,7 @@ import json, time
 
 client = mqtt.Client()
 client.username_pw_set("DEVICE_ID", "DEVICE_PASSWORD")
-client.connect("iotlab.am", 1883)
+client.connect("emqx.iotlab.am", 1883)
 
 while True:
     payload = {"temperature": 22.5, "humidity": 60}
@@ -539,9 +577,9 @@ while True:
       <table>
         <thead><tr><th>Protocol</th><th>Host</th><th>Port</th><th>Notes</th></tr></thead>
         <tbody>
-          <tr><td>MQTT (TCP)</td><td>iotlab.am</td><td>1883</td><td>Standard</td></tr>
-          <tr><td>MQTT over WS</td><td>iotlab.am</td><td>8083</td><td>WebSocket</td></tr>
-          <tr><td>MQTT over TLS</td><td>iotlab.am</td><td>8883</td><td>Secure</td></tr>
+          <tr><td>MQTT (TCP)</td><td>emqx.iotlab.am</td><td>1883</td><td>Standard</td></tr>
+          <tr><td>MQTT over WS</td><td>emqx.iotlab.am</td><td>8083</td><td>WebSocket</td></tr>
+          <tr><td>MQTT over TLS</td><td>emqx.iotlab.am</td><td>8883</td><td>Secure</td></tr>
         </tbody>
       </table>
 
@@ -562,7 +600,7 @@ Example: DVONBeK1zitwkwN6/sensors/temperature</code></pre>
       <pre><code class="language-python">import paho.mqtt.client as mqtt
 import json, time, random
 
-BROKER   = "iotlab.am"
+BROKER   = "emqx.iotlab.am"
 PORT     = 1883
 DEVICE_ID   = "CEZmobC6SYjT1azK"
 DEVICE_PASS = "q56iK4aGiY3POiLm"
@@ -593,7 +631,7 @@ while True:
 
 const char* ssid     = "YOUR_WIFI";
 const char* password = "YOUR_WIFI_PASS";
-const char* mqtt_server   = "iotlab.am";
+const char* mqtt_server   = "emqx.iotlab.am";
 const char* mqtt_user     = "CEZmobC6SYjT1azK";   // device_id
 const char* mqtt_password = "q56iK4aGiY3POiLm";    // device_password
 const char* topic         = "DVONBeK1zitwkwN6/sensors/data";
@@ -655,7 +693,7 @@ void loop() {
       <table>
         <thead><tr><th>Property</th><th>Value</th></tr></thead>
         <tbody>
-          <tr><td>URL</td><td><code>http://iotlab.am:7003</code></td></tr>
+          <tr><td>URL</td><td><a href="https://http.iotlab.am" target="_blank">https://http.iotlab.am</a></td></tr>
           <tr><td>Container</td><td>http-to-mqtt-flask-app-1</td></tr>
           <tr><td>Port</td><td>7003 → 5000 (internal)</td></tr>
           <tr><td>MQTT broker</td><td>host.docker.internal:1883</td></tr>
@@ -718,8 +756,13 @@ void loop() {
 
       <h3>Examples</h3>
 
+      <div class="callout warning">
+        <strong>Note:</strong> The root URL <code>https://http.iotlab.am/</code> returns 404 — that's expected.
+        The only valid endpoints are <code>/send-to-mqtt</code> and <code>/health</code>.
+      </div>
+
       <h4>curl</h4>
-      <pre><code class="language-bash">curl -X POST http://iotlab.am:7003/send-to-mqtt \
+      <pre><code class="language-bash">curl -X POST https://http.iotlab.am/send-to-mqtt \
   -H "Content-Type: application/json" \
   -d '{
     "username": "CEZmobC6SYjT1azK",
@@ -731,7 +774,7 @@ void loop() {
       <h4>Python</h4>
       <pre><code class="language-python">import requests
 
-url = "http://iotlab.am:7003/send-to-mqtt"
+url = "https://http.iotlab.am/send-to-mqtt"
 
 payload = {
     "username": "CEZmobC6SYjT1azK",
@@ -752,7 +795,7 @@ print(response.json())</code></pre>
 #include &lt;HTTPClient.h&gt;
 #include &lt;ArduinoJson.h&gt;
 
-const char* server = "http://iotlab.am:7003/send-to-mqtt";
+const char* server = "https://http.iotlab.am/send-to-mqtt";
 
 void sendSensorData(float temp, float hum) {
   HTTPClient http;
