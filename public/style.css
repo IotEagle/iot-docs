@@ -208,13 +208,19 @@ code {
   padding: 1px 6px; border-radius: 4px; color: var(--accent2);
 }
 
-/* Syntax highlight */
-.kw  { color: #ff7b72; }
-.str { color: #a5d6ff; }
-.cm  { color: #6e7681; font-style: italic; }
-.num { color: #79c0ff; }
-.fn  { color: #d2a8ff; }
-.key { color: #7ee787; }
+/* Override Prism theme to match our dark background */
+pre[class*="language-"], code[class*="language-"] {
+  background: var(--bg2) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 13px !important;
+  text-shadow: none !important;
+}
+pre[class*="language-"] {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 16px !important;
+  margin: 10px 0 !important;
+}
 
 /* ── Divider ─────────────────────────────── */
 .divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }

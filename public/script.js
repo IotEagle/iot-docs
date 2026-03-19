@@ -45,46 +45,7 @@ function searchDocs(query) {
   });
 }
 
-// Syntax highlight (lightweight, no external deps)
-document.querySelectorAll('pre code').forEach(block => {
-  const lang = block.className.replace('lang-', '');
-  if (!lang) return;
-
-  let html = block.textContent
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-  if (lang === 'json') {
-    html = html
-      .replace(/(".*?")(\s*:)/g, '<span class="key">$1</span>$2')
-      .replace(/:\s*(".*?")/g, ': <span class="str">$1</span>')
-      .replace(/:\s*(\d+\.?\d*)/g, ': <span class="num">$1</span>')
-      .replace(/:\s*(true|false|null)/g, ': <span class="kw">$1</span>');
-  } else if (lang === 'python') {
-    html = html
-      .replace(/(#.*)/g, '<span class="cm">$1</span>')
-      .replace(/\b(import|from|def|class|if|else|elif|while|for|in|return|True|False|None|and|or|not)\b/g, '<span class="kw">$1</span>')
-      .replace(/(".*?"|'.*?')/g, '<span class="str">$1</span>')
-      .replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
-  } else if (lang === 'bash') {
-    html = html
-      .replace(/(#.*)/g, '<span class="cm">$1</span>')
-      .replace(/\b(curl|docker|cd|cat|echo|export|sudo|git)\b/g, '<span class="kw">$1</span>')
-      .replace(/(".*?"|'.*?')/g, '<span class="str">$1</span>');
-  } else if (lang === 'yaml') {
-    html = html
-      .replace(/(#.*)/g, '<span class="cm">$1</span>')
-      .replace(/^(\s*[\w-]+):/gm, '<span class="key">$1</span>:')
-      .replace(/:\s*(".*?"|'.*?')/g, ': <span class="str">$1</span>');
-  } else if (lang === 'cpp') {
-    html = html
-      .replace(/(\/\/.*)/g, '<span class="cm">$1</span>')
-      .replace(/\b(include|const|char|int|void|bool|while|if|else|setup|loop|new|delete|return|true|false)\b/g, '<span class="kw">$1</span>')
-      .replace(/(".*?")/g, '<span class="str">$1</span>')
-      .replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
-  }
-
-  block.innerHTML = html;
-});
+// Syntax highlight via Prism (loaded in HTML head)
 
 // Copy button on hover over code blocks
 document.querySelectorAll('pre').forEach(pre => {

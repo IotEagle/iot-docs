@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
 </head>
 <body>
 
@@ -201,7 +202,7 @@
           <div class="step-num">1</div>
           <div class="step-body">
             <h4>Create an account</h4>
-            <pre><code class="lang-bash">curl -X POST https://api.iotlab.am/users/signup \
+            <pre><code class="language-bash">curl -X POST https://api.iotlab.am/users/signup \
   -H "Content-Type: application/json" \
   -d '{
     "username": "mydevice",
@@ -214,7 +215,7 @@
           <div class="step-num">2</div>
           <div class="step-body">
             <h4>Sign in &amp; register a device</h4>
-            <pre><code class="lang-bash"># Sign in
+            <pre><code class="language-bash"># Sign in
 SESSION=$(curl -s -X POST https://api.iotlab.am/users/signin \
   -H "Content-Type: application/json" \
   -d '{"username":"mydevice","password":"securepass"}' \
@@ -238,7 +239,7 @@ curl -X POST https://api.iotlab.am/devices/add \
           <div class="step-num">3</div>
           <div class="step-body">
             <h4>Publish sensor data via MQTT</h4>
-            <pre><code class="lang-python">import paho.mqtt.client as mqtt
+            <pre><code class="language-python">import paho.mqtt.client as mqtt
 import json, time
 
 client = mqtt.Client()
@@ -274,7 +275,7 @@ while True:
             <div class="param-row"><span><code>email</code></span><span>string</span><span>Email address</span></div>
             <div class="param-row"><span><code>password</code></span><span>string</span><span>Plain text (hashed server-side)</span></div>
           </div>
-          <pre><code class="lang-json">// Response 200
+          <pre><code class="language-json">// Response 200
 { "message": "User created successfully" }</code></pre>
         </div>
       </div>
@@ -286,7 +287,7 @@ while True:
           <span class="endpoint-desc">Authenticate and get a session token</span>
         </div>
         <div class="endpoint-body">
-          <pre><code class="lang-json">// Request
+          <pre><code class="language-json">// Request
 { "username": "myuser", "password": "mypass" }
 
 // Response 200
@@ -305,7 +306,7 @@ while True:
           <span class="endpoint-desc">Invalidate a session</span>
         </div>
         <div class="endpoint-body">
-          <pre><code class="lang-json">// Request
+          <pre><code class="language-json">// Request
 { "session": "AbCdEfGh..." }
 
 // Response 200
@@ -328,7 +329,7 @@ while True:
           <span class="endpoint-desc">Register a new device</span>
         </div>
         <div class="endpoint-body">
-          <pre><code class="lang-json">// Request
+          <pre><code class="language-json">// Request
 {
   "user_session": "AbCdEfGh...",
   "device_name": "Temperature Sensor",
@@ -357,7 +358,7 @@ while True:
           <span class="endpoint-desc">List all devices with credentials and rules</span>
         </div>
         <div class="endpoint-body">
-          <pre><code class="lang-json">// Request
+          <pre><code class="language-json">// Request
 { "user_session": "AbCdEfGh..." }
 
 // Response 200
@@ -384,7 +385,7 @@ while True:
           <span class="endpoint-desc">Get the most recent data point for a device</span>
         </div>
         <div class="endpoint-body">
-          <pre><code class="lang-json">// Request
+          <pre><code class="language-json">// Request
 {
   "user_session": "AbCdEfGh...",
   "device_id": "CEZmobC6SYjT1azK"
@@ -409,7 +410,7 @@ while True:
           <span class="endpoint-desc">Remove a device and its MQTT credentials</span>
         </div>
         <div class="endpoint-body">
-          <pre><code class="lang-json">// Request
+          <pre><code class="language-json">// Request
 {
   "user_session": "AbCdEfGh...",
   "device_id": "CEZmobC6SYjT1azK"
@@ -435,7 +436,7 @@ while True:
           <span class="endpoint-desc">Get data for a specific device with filters</span>
         </div>
         <div class="endpoint-body">
-          <pre><code class="lang-json">// Request
+          <pre><code class="language-json">// Request
 {
   "user_session": "AbCdEfGh...",
   "device_id": "CEZmobC6SYjT1azK",
@@ -491,7 +492,7 @@ while True:
           <span class="endpoint-desc">Get record count and timestamp range</span>
         </div>
         <div class="endpoint-body">
-          <pre><code class="lang-json">// Request
+          <pre><code class="language-json">// Request
 {
   "user_session": "AbCdEfGh...",
   "device_id": "CEZmobC6SYjT1azK"   // optional
@@ -515,7 +516,7 @@ while True:
           <span class="endpoint-desc">Count records matching a filter</span>
         </div>
         <div class="endpoint-body">
-          <pre><code class="lang-json">// Request
+          <pre><code class="language-json">// Request
 {
   "user_session": "AbCdEfGh...",
   "filters": { "temperature": { "$gt": 30 } }
@@ -545,11 +546,11 @@ while True:
       </table>
 
       <h3>Authentication</h3>
-      <pre><code class="lang-text">Username: {device_id}       e.g. CEZmobC6SYjT1azK
+      <pre><code class="language-text">Username: {device_id}       e.g. CEZmobC6SYjT1azK
 Password: {device_password} e.g. q56iK4aGiY3POiLm</code></pre>
 
       <h3>Topic Structure</h3>
-      <pre><code class="lang-text">{user_id}/{your_topic}
+      <pre><code class="language-text">{user_id}/{your_topic}
 
 Example: DVONBeK1zitwkwN6/sensors/temperature</code></pre>
       <div class="callout warning">
@@ -558,7 +559,7 @@ Example: DVONBeK1zitwkwN6/sensors/temperature</code></pre>
       </div>
 
       <h3>Python Example</h3>
-      <pre><code class="lang-python">import paho.mqtt.client as mqtt
+      <pre><code class="language-python">import paho.mqtt.client as mqtt
 import json, time, random
 
 BROKER   = "iotlab.am"
@@ -586,7 +587,7 @@ while True:
     time.sleep(30)</code></pre>
 
       <h3>Arduino / ESP32 Example</h3>
-      <pre><code class="lang-cpp">#include &lt;WiFi.h&gt;
+      <pre><code class="language-cpp">#include &lt;WiFi.h&gt;
 #include &lt;PubSubClient.h&gt;
 #include &lt;ArduinoJson.h&gt;
 
@@ -678,7 +679,7 @@ void loop() {
             <div class="param-row"><span><code>topic</code></span><span>string</span><span>Full MQTT topic including user_id prefix</span></div>
             <div class="param-row"><span><code>data</code></span><span>object</span><span>Any JSON object — your sensor payload</span></div>
           </div>
-          <pre><code class="lang-json">// Request
+          <pre><code class="language-json">// Request
 {
   "username": "CEZmobC6SYjT1azK",
   "password": "q56iK4aGiY3POiLm",
@@ -710,7 +711,7 @@ void loop() {
           <span class="endpoint-desc">Health check — confirms the service is running</span>
         </div>
         <div class="endpoint-body">
-          <pre><code class="lang-json">// Response 200
+          <pre><code class="language-json">// Response 200
 { "status": "healthy" }</code></pre>
         </div>
       </div>
@@ -718,7 +719,7 @@ void loop() {
       <h3>Examples</h3>
 
       <h4>curl</h4>
-      <pre><code class="lang-bash">curl -X POST http://iotlab.am:7003/send-to-mqtt \
+      <pre><code class="language-bash">curl -X POST http://iotlab.am:7003/send-to-mqtt \
   -H "Content-Type: application/json" \
   -d '{
     "username": "CEZmobC6SYjT1azK",
@@ -728,7 +729,7 @@ void loop() {
   }'</code></pre>
 
       <h4>Python</h4>
-      <pre><code class="lang-python">import requests
+      <pre><code class="language-python">import requests
 
 url = "http://iotlab.am:7003/send-to-mqtt"
 
@@ -747,7 +748,7 @@ response = requests.post(url, json=payload)
 print(response.json())</code></pre>
 
       <h4>Arduino / ESP32 (HTTPClient)</h4>
-      <pre><code class="lang-cpp">#include &lt;WiFi.h&gt;
+      <pre><code class="language-cpp">#include &lt;WiFi.h&gt;
 #include &lt;HTTPClient.h&gt;
 #include &lt;ArduinoJson.h&gt;
 
@@ -808,7 +809,7 @@ void loop() {
       <p>Payload must be valid JSON. Any numeric fields are automatically detected and charted by the dashboard.</p>
 
       <h3>Recommended Schema</h3>
-      <pre><code class="lang-json">{
+      <pre><code class="language-json">{
   "temperature": 22.5,
   "humidity": 60.1,
   "pressure": 1013.2,
@@ -817,7 +818,7 @@ void loop() {
 
       <h3>Stored Document</h3>
       <p>After passing through <code>mqtt_to_mongo</code>, the document stored in MongoDB looks like:</p>
-      <pre><code class="lang-json">{
+      <pre><code class="language-json">{
   "_id": "ObjectId(...)",
   "device_id": "CEZmobC6SYjT1azK",
   "temperature": 22.5,
@@ -864,7 +865,7 @@ void loop() {
 
       <h3>Rebuilding the Dashboard</h3>
       <p>If you change credentials or need to rebuild:</p>
-      <pre><code class="lang-bash">cd /root/github/iot-dashboard
+      <pre><code class="language-bash">cd /root/github/iot-dashboard
 DASHBOARD_USER=youruser DASHBOARD_PASS=yourpass \
   docker compose up -d --build</code></pre>
     </section>
@@ -897,7 +898,7 @@ DASHBOARD_USER=youruser DASHBOARD_PASS=yourpass \
 
       <h3>Configuration</h3>
       <p>Edit <code>docker-compose.yml</code> in <code>/root/github/iot-simulator/</code>:</p>
-      <pre><code class="lang-yaml">environment:
+      <pre><code class="language-yaml">environment:
   MONGO_URI: mongodb://user:pass@host:27017
   USER_ID: DVONBeK1zitwkwN6          # your user_id
   CLIMATE_DEVICE_ID: CEZmobC6SYjT1azK
@@ -905,7 +906,7 @@ DASHBOARD_USER=youruser DASHBOARD_PASS=yourpass \
   INTERVAL: "15"                      # seconds between readings</code></pre>
 
       <h3>Commands</h3>
-      <pre><code class="lang-bash"># Start
+      <pre><code class="language-bash"># Start
 cd /root/github/iot-simulator && docker compose up -d
 
 # View live output
@@ -923,7 +924,7 @@ docker compose down</code></pre>
       <p>All services are deployed on a single Debian server at <code>10.10.10.103</code> using Docker Compose.</p>
 
       <h3>Directory Structure</h3>
-      <pre><code class="lang-text">/root/
+      <pre><code class="language-text">/root/
 ├── github/
 │   ├── main_api/          # REST API (Flask)
 │   ├── mqtt_to_mongo/     # MQTT→MongoDB bridge
@@ -939,20 +940,20 @@ docker compose down</code></pre>
 
       <h3>Environment Variables</h3>
       <h4>.main_api.env</h4>
-      <pre><code class="lang-bash">MONGO_URI=mongodb://user:pass@host:27017
+      <pre><code class="language-bash">MONGO_URI=mongodb://user:pass@host:27017
 EMQX_API_KEY=your_key
 EMQX_API_SECRET=your_secret
 EMQX_API_URL=http://host.docker.internal:18083</code></pre>
 
       <h4>.mqtt_to_mongo.env</h4>
-      <pre><code class="lang-bash">MQTT_API=host.docker.internal
+      <pre><code class="language-bash">MQTT_API=host.docker.internal
 MQTT_PORT=1883
 MQTT_USER=your_mqtt_user
 MQTT_PASS=your_mqtt_pass
 MONGO_URI=mongodb://user:pass@host:27017</code></pre>
 
       <h3>Common Commands</h3>
-      <pre><code class="lang-bash"># Restart any service
+      <pre><code class="language-bash"># Restart any service
 cd /root/github/main_api && docker compose restart
 
 # Rebuild after code changes
@@ -986,6 +987,12 @@ docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"</code></pre>
   </div>
 </main>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
