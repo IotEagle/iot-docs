@@ -47,6 +47,7 @@
   <div class="nav-section">
     <span class="nav-label">Integration</span>
     <a href="#mqtt" class="nav-link" onclick="setActive(this)">MQTT Integration</a>
+    <a href="#http-to-mqtt" class="nav-link" onclick="setActive(this)">HTTP to MQTT</a>
     <a href="#data-format" class="nav-link" onclick="setActive(this)">Data Format</a>
   </div>
   <div class="nav-section">
@@ -172,6 +173,7 @@
           <tr><td><code>emqx</code></td><td>emqx</td><td>1883, 8083, 18083</td><td>MQTT broker + management UI</td></tr>
           <tr><td><code>mongodb</code></td><td>docker-files-mongodb-1</td><td>27017</td><td>Database</td></tr>
           <tr><td><code>mqtt_to_mongo</code></td><td>mqtt_to_python</td><td>—</td><td>MQTT→MongoDB bridge</td></tr>
+          <tr><td><code>http-to-mqtt</code></td><td>http-to-mqtt-flask-app-1</td><td>7003</td><td>HTTP→MQTT bridge (Flask)</td></tr>
           <tr><td><code>iot-dashboard</code></td><td>iot-dashboard</td><td>8080</td><td>React dashboard (nginx)</td></tr>
           <tr><td><code>iot-simulator</code></td><td>iot-simulator</td><td>—</td><td>Test data generator</td></tr>
           <tr><td><code>iot-docs</code></td><td>iot-docs</td><td>8090</td><td>This documentation</td></tr>
@@ -622,6 +624,184 @@ void loop() {
 
     <div class="divider"></div>
 
+    <!-- HTTP TO MQTT -->
+    <section id="http-to-mqtt">
+      <h2>HTTP to MQTT</h2>
+      <p>
+        The <code>http-to-mqtt</code> service acts as a bridge — it accepts a standard HTTP POST request
+        and publishes the payload to the MQTT broker on your behalf. This is useful when your device or
+        application can make HTTP requests but doesn't have a native MQTT library.
+      </p>
+
+      <div class="cards-grid two-col" style="margin-bottom:24px">
+        <div class="card">
+          <div class="card-icon blue">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>No MQTT library needed</h3>
+          <p>Any HTTP client works — curl, Python requests, Arduino HTTPClient, Postman.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon green">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <h3>Same auth model</h3>
+          <p>Uses the same <code>device_id</code> / <code>password</code> credentials as direct MQTT.</p>
+        </div>
+      </div>
+
+      <h3>Service Details</h3>
+      <table>
+        <thead><tr><th>Property</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>URL</td><td><code>http://iotlab.am:7003</code></td></tr>
+          <tr><td>Container</td><td>http-to-mqtt-flask-app-1</td></tr>
+          <tr><td>Port</td><td>7003 → 5000 (internal)</td></tr>
+          <tr><td>MQTT broker</td><td>host.docker.internal:1883</td></tr>
+          <tr><td>GitHub</td><td><a href="https://github.com/IotEagle/http-to-mqtt" target="_blank">IotEagle/http-to-mqtt</a></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Endpoints</h3>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <code>/send-to-mqtt</code>
+          <span class="endpoint-desc">Publish data to an MQTT topic via HTTP</span>
+        </div>
+        <div class="endpoint-body">
+          <div class="param-table">
+            <div class="param-row header"><span>Field</span><span>Type</span><span>Description</span></div>
+            <div class="param-row"><span><code>username</code></span><span>string</span><span>Device ID (from <code>/devices/get</code>)</span></div>
+            <div class="param-row"><span><code>password</code></span><span>string</span><span>Device password (from <code>/devices/get</code>)</span></div>
+            <div class="param-row"><span><code>topic</code></span><span>string</span><span>Full MQTT topic including user_id prefix</span></div>
+            <div class="param-row"><span><code>data</code></span><span>object</span><span>Any JSON object — your sensor payload</span></div>
+          </div>
+          <pre><code class="lang-json">// Request
+{
+  "username": "CEZmobC6SYjT1azK",
+  "password": "q56iK4aGiY3POiLm",
+  "topic":    "DVONBeK1zitwkwN6/sensors/data",
+  "data": {
+    "temperature": 22.5,
+    "humidity":    60.1
+  }
+}
+
+// Response 200
+{
+  "status": "success",
+  "message": "Data published to topic 'DVONBeK1zitwkwN6/sensors/data'"
+}
+
+// Response 400
+{ "error": "Missing required fields: username, password, data, topic" }
+
+// Response 500
+{ "status": "error", "message": "MQTT connection failed: ..." }</code></pre>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method get">GET</span>
+          <code>/health</code>
+          <span class="endpoint-desc">Health check — confirms the service is running</span>
+        </div>
+        <div class="endpoint-body">
+          <pre><code class="lang-json">// Response 200
+{ "status": "healthy" }</code></pre>
+        </div>
+      </div>
+
+      <h3>Examples</h3>
+
+      <h4>curl</h4>
+      <pre><code class="lang-bash">curl -X POST http://iotlab.am:7003/send-to-mqtt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "CEZmobC6SYjT1azK",
+    "password": "q56iK4aGiY3POiLm",
+    "topic":    "DVONBeK1zitwkwN6/sensors/data",
+    "data": { "temperature": 22.5, "humidity": 60.1 }
+  }'</code></pre>
+
+      <h4>Python</h4>
+      <pre><code class="lang-python">import requests
+
+url = "http://iotlab.am:7003/send-to-mqtt"
+
+payload = {
+    "username": "CEZmobC6SYjT1azK",
+    "password": "q56iK4aGiY3POiLm",
+    "topic":    "DVONBeK1zitwkwN6/sensors/data",
+    "data": {
+        "temperature": 22.5,
+        "humidity":    60.1,
+        "pressure":    1013.2
+    }
+}
+
+response = requests.post(url, json=payload)
+print(response.json())</code></pre>
+
+      <h4>Arduino / ESP32 (HTTPClient)</h4>
+      <pre><code class="lang-cpp">#include &lt;WiFi.h&gt;
+#include &lt;HTTPClient.h&gt;
+#include &lt;ArduinoJson.h&gt;
+
+const char* server = "http://iotlab.am:7003/send-to-mqtt";
+
+void sendSensorData(float temp, float hum) {
+  HTTPClient http;
+  http.begin(server);
+  http.addHeader("Content-Type", "application/json");
+
+  StaticJsonDocument&lt;256&gt; doc;
+  doc["username"] = "CEZmobC6SYjT1azK";
+  doc["password"] = "q56iK4aGiY3POiLm";
+  doc["topic"]    = "DVONBeK1zitwkwN6/sensors/data";
+
+  JsonObject data = doc.createNestedObject("data");
+  data["temperature"] = temp;
+  data["humidity"]    = hum;
+
+  String body;
+  serializeJson(doc, body);
+
+  int code = http.POST(body);
+  Serial.println(http.getString());
+  http.end();
+}
+
+void loop() {
+  sendSensorData(22.5, 60.0);
+  delay(30000);
+}</code></pre>
+
+      <div class="callout info">
+        <strong>How it works internally:</strong> The service creates a fresh MQTT client per request,
+        authenticates with the broker using your device credentials, publishes the JSON payload, then
+        disconnects. The broker's ACL rules still apply — the device can only publish to its allowed topics.
+      </div>
+
+      <h3>When to use HTTP vs direct MQTT</h3>
+      <table>
+        <thead><tr><th>Scenario</th><th>Recommended</th></tr></thead>
+        <tbody>
+          <tr><td>Microcontroller with MQTT library (ESP32, Arduino + Ethernet)</td><td>Direct MQTT</td></tr>
+          <tr><td>Server-side app or script sending occasional data</td><td>HTTP to MQTT</td></tr>
+          <tr><td>Device behind restrictive firewall (port 1883 blocked)</td><td>HTTP to MQTT</td></tr>
+          <tr><td>Rapid prototyping / testing with curl or Postman</td><td>HTTP to MQTT</td></tr>
+          <tr><td>High-frequency streaming (&gt;1 msg/sec)</td><td>Direct MQTT</td></tr>
+          <tr><td>Battery-powered device (persistent connection saves power)</td><td>Direct MQTT</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="divider"></div>
+
     <!-- DATA FORMAT -->
     <section id="data-format">
       <h2>Data Format</h2>
@@ -791,6 +971,7 @@ docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"</code></pre>
         <thead><tr><th>Repo</th><th>Description</th></tr></thead>
         <tbody>
           <tr><td><a href="https://github.com/IotEagle/main_api" target="_blank">IotEagle/main_api</a></td><td>REST API</td></tr>
+          <tr><td><a href="https://github.com/IotEagle/http-to-mqtt" target="_blank">IotEagle/http-to-mqtt</a></td><td>HTTP→MQTT bridge</td></tr>
           <tr><td><a href="https://github.com/IotEagle/iot-dashboard" target="_blank">IotEagle/iot-dashboard</a></td><td>React dashboard</td></tr>
           <tr><td><a href="https://github.com/IotEagle/iot-simulator" target="_blank">IotEagle/iot-simulator</a></td><td>Data simulator</td></tr>
           <tr><td><a href="https://github.com/IotEagle/iot-docs" target="_blank">IotEagle/iot-docs</a></td><td>Documentation</td></tr>
