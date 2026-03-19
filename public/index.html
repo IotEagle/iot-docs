@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IotEagle Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="7" fill="#3b82f6" fill-opacity="0.15"/>
+        <rect x="5" y="10" width="4" height="13" rx="1" fill="#3b82f6"/>
+        <rect x="12" y="7" width="4" height="16" rx="1" fill="#3b82f6"/>
+        <rect x="19" y="13" width="4" height="10" rx="1" fill="#60a5fa"/>
+      </svg>
+      <span>IotEagle</span>
+    </div>
+    <span class="version-badge">v1.0</span>
+  </div>
+
+  <div class="sidebar-search">
+    <input type="text" id="searchInput" placeholder="Search docs…" oninput="searchDocs(this.value)" />
+    <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+  </div>
+
+  <div class="nav-section">
+    <span class="nav-label">Getting Started</span>
+    <a href="#overview" class="nav-link active" onclick="setActive(this)">Overview</a>
+    <a href="#architecture" class="nav-link" onclick="setActive(this)">Architecture</a>
+    <a href="#quickstart" class="nav-link" onclick="setActive(this)">Quick Start</a>
+  </div>
+  <div class="nav-section">
+    <span class="nav-label">API Reference</span>
+    <a href="#auth" class="nav-link" onclick="setActive(this)">Authentication</a>
+    <a href="#devices-api" class="nav-link" onclick="setActive(this)">Devices</a>
+    <a href="#data-api" class="nav-link" onclick="setActive(this)">Data</a>
+  </div>
+  <div class="nav-section">
+    <span class="nav-label">Integration</span>
+    <a href="#mqtt" class="nav-link" onclick="setActive(this)">MQTT Integration</a>
+    <a href="#data-format" class="nav-link" onclick="setActive(this)">Data Format</a>
+  </div>
+  <div class="nav-section">
+    <span class="nav-label">Services</span>
+    <a href="#dashboard" class="nav-link" onclick="setActive(this)">Dashboard</a>
+    <a href="#simulator" class="nav-link" onclick="setActive(this)">Simulator</a>
+    <a href="#deployment" class="nav-link" onclick="setActive(this)">Deployment</a>
+  </div>
+</nav>
+
+<!-- Mobile nav toggle -->
+<button class="mobile-toggle" onclick="toggleSidebar()">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+  </svg>
+</button>
+
+<!-- Main content -->
+<main class="content">
+  <div class="content-inner">
+
+    <!-- OVERVIEW -->
+    <section id="overview">
+      <div class="page-header">
+        <div class="badge">Platform</div>
+        <h1>IotEagle Platform</h1>
+        <p class="lead">A complete IoT data pipeline — from device to dashboard. Collect sensor data over MQTT, store it in MongoDB, and visualize it in real time.</p>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-icon blue">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+          <h3>REST API</h3>
+          <p>Flask-based API for user management, device registration, and data querying with session auth.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon green">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <h3>MQTT Broker</h3>
+          <p>EMQX 5.x handles all device connections with per-device auth and topic-based ACL rules.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon purple">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+          <h3>MongoDB</h3>
+          <p>Time-series sensor data stored per user. Each user gets an isolated collection.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon orange">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <h3>Dashboard</h3>
+          <p>React-based read-only dashboard with live charts, device selector, and time range filters.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ARCHITECTURE -->
+    <section id="architecture">
+      <h2>Architecture</h2>
+      <p>All services run as Docker containers on a single host, connected via <code>host.docker.internal</code>.</p>
+
+      <div class="arch-diagram">
+        <div class="arch-row">
+          <div class="arch-node device">
+            <div class="arch-icon">📡</div>
+            <div class="arch-label">IoT Device</div>
+            <div class="arch-sub">MQTT client</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-node broker">
+            <div class="arch-icon">⚡</div>
+            <div class="arch-label">EMQX Broker</div>
+            <div class="arch-sub">:1883 / :8083</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-node worker">
+            <div class="arch-icon">🔄</div>
+            <div class="arch-label">mqtt_to_mongo</div>
+            <div class="arch-sub">bridge worker</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-node db">
+            <div class="arch-icon">🗄️</div>
+            <div class="arch-label">MongoDB</div>
+            <div class="arch-sub">:27017</div>
+          </div>
+        </div>
+        <div class="arch-row arch-row-2">
+          <div class="arch-node api">
+            <div class="arch-icon">🔌</div>
+            <div class="arch-label">main_api</div>
+            <div class="arch-sub">Flask :5000</div>
+          </div>
+          <div class="arch-arrow">↕</div>
+          <div class="arch-node dash">
+            <div class="arch-icon">📊</div>
+            <div class="arch-label">Dashboard</div>
+            <div class="arch-sub">React :8080</div>
+          </div>
+          <div class="arch-arrow">↕</div>
+          <div class="arch-node client">
+            <div class="arch-icon">🌐</div>
+            <div class="arch-label">Browser</div>
+            <div class="arch-sub">dashboard.iotlab.am</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Services &amp; Ports</h3>
+      <table>
+        <thead>
+          <tr><th>Service</th><th>Container</th><th>Port</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>main_api</code></td><td>main_api</td><td>5000</td><td>REST API (Flask + Gunicorn)</td></tr>
+          <tr><td><code>emqx</code></td><td>emqx</td><td>1883, 8083, 18083</td><td>MQTT broker + management UI</td></tr>
+          <tr><td><code>mongodb</code></td><td>docker-files-mongodb-1</td><td>27017</td><td>Database</td></tr>
+          <tr><td><code>mqtt_to_mongo</code></td><td>mqtt_to_python</td><td>—</td><td>MQTT→MongoDB bridge</td></tr>
+          <tr><td><code>iot-dashboard</code></td><td>iot-dashboard</td><td>8080</td><td>React dashboard (nginx)</td></tr>
+          <tr><td><code>iot-simulator</code></td><td>iot-simulator</td><td>—</td><td>Test data generator</td></tr>
+          <tr><td><code>iot-docs</code></td><td>iot-docs</td><td>8090</td><td>This documentation</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Data Flow</h3>
+      <ol>
+        <li>An IoT device connects to <strong>EMQX</strong> using its <code>device_id</code> as username and MQTT password.</li>
+        <li>The device publishes JSON to its assigned topic: <code>{user_id}/{subtopic}</code>.</li>
+        <li><strong>mqtt_to_mongo</strong> subscribes to <code>#</code>, parses each message, and writes it to MongoDB collection <code>mqtt_data.{user_id}</code> with a <code>device_id</code> and <code>timestamp</code>.</li>
+        <li>The <strong>Dashboard</strong> queries <code>main_api</code> which reads from MongoDB and returns the data.</li>
+      </ol>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- QUICK START -->
+    <section id="quickstart">
+      <h2>Quick Start</h2>
+      <p>Register a user, add a device, and start sending data in 3 steps.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h4>Create an account</h4>
+            <pre><code class="lang-bash">curl -X POST https://api.iotlab.am/users/signup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "mydevice",
+    "email": "me@example.com",
+    "password": "securepass"
+  }'</code></pre>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h4>Sign in &amp; register a device</h4>
+            <pre><code class="lang-bash"># Sign in
+SESSION=$(curl -s -X POST https://api.iotlab.am/users/signin \
+  -H "Content-Type: application/json" \
+  -d '{"username":"mydevice","password":"securepass"}' \
+  | jq -r '.session')
+
+# Add device
+curl -X POST https://api.iotlab.am/devices/add \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"user_session\": \"$SESSION\",
+    \"device_name\": \"My Sensor\",
+    \"rules\": [{
+      \"action\": \"publish\",
+      \"topic\": \"sensors/data\",
+      \"permission\": \"allow\"
+    }]
+  }"</code></pre>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h4>Publish sensor data via MQTT</h4>
+            <pre><code class="lang-python">import paho.mqtt.client as mqtt
+import json, time
+
+client = mqtt.Client()
+client.username_pw_set("DEVICE_ID", "DEVICE_PASSWORD")
+client.connect("iotlab.am", 1883)
+
+while True:
+    payload = {"temperature": 22.5, "humidity": 60}
+    client.publish("{USER_ID}/sensors/data", json.dumps(payload))
+    time.sleep(30)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- AUTH API -->
+    <section id="auth">
+      <h2>Authentication</h2>
+      <p>All API endpoints (except <code>/signup</code> and <code>/signin</code>) require a <code>user_session</code> token in the request body. Sessions do not expire by default.</p>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <code>/users/signup</code>
+          <span class="endpoint-desc">Register a new user</span>
+        </div>
+        <div class="endpoint-body">
+          <div class="param-table">
+            <div class="param-row header"><span>Field</span><span>Type</span><span>Description</span></div>
+            <div class="param-row"><span><code>username</code></span><span>string</span><span>Unique username</span></div>
+            <div class="param-row"><span><code>email</code></span><span>string</span><span>Email address</span></div>
+            <div class="param-row"><span><code>password</code></span><span>string</span><span>Plain text (hashed server-side)</span></div>
+          </div>
+          <pre><code class="lang-json">// Response 200
+{ "message": "User created successfully" }</code></pre>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <code>/users/signin</code>
+          <span class="endpoint-desc">Authenticate and get a session token</span>
+        </div>
+        <div class="endpoint-body">
+          <pre><code class="lang-json">// Request
+{ "username": "myuser", "password": "mypass" }
+
+// Response 200
+{
+  "message": "Login successful",
+  "session": "AbCdEfGh...",   // 100-char token
+  "user_id": "DVONBeK1zitwkwN6"
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <code>/users/signout</code>
+          <span class="endpoint-desc">Invalidate a session</span>
+        </div>
+        <div class="endpoint-body">
+          <pre><code class="lang-json">// Request
+{ "session": "AbCdEfGh..." }
+
+// Response 200
+{ "message": "Logout successful" }</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- DEVICES API -->
+    <section id="devices-api">
+      <h2>Devices API</h2>
+      <p>Devices are virtual MQTT clients registered under your account. Each device gets its own credentials and ACL rules.</p>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <code>/devices/add</code>
+          <span class="endpoint-desc">Register a new device</span>
+        </div>
+        <div class="endpoint-body">
+          <pre><code class="lang-json">// Request
+{
+  "user_session": "AbCdEfGh...",
+  "device_name": "Temperature Sensor",
+  "rules": [
+    {
+      "action": "publish",
+      "topic": "sensors/temperature",
+      "permission": "allow"
+    }
+  ]
+}
+
+// Response 200
+{ "message": "Device added successfully" }</code></pre>
+          <div class="callout info">
+            <strong>Note:</strong> Topics are prefixed with <code>{user_id}/</code> automatically.
+            So <code>sensors/temperature</code> becomes <code>{user_id}/sensors/temperature</code>.
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <code>/devices/get</code>
+          <span class="endpoint-desc">List all devices with credentials and rules</span>
+        </div>
+        <div class="endpoint-body">
+          <pre><code class="lang-json">// Request
+{ "user_session": "AbCdEfGh..." }
+
+// Response 200
+{
+  "devices": [{
+    "device_id": "CEZmobC6SYjT1azK",
+    "password": "q56iK4aGiY3POiLm",
+    "device_name": "Climate Sensor 1",
+    "rules": [{
+      "action": "publish",
+      "topic": "DVONBeK1zitwkwN6/sensors/data",
+      "permission": "allow"
+    }],
+    "created_at": "2026-03-19T09:30:24.576000"
+  }]
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <code>/devices/get_last_data</code>
+          <span class="endpoint-desc">Get the most recent data point for a device</span>
+        </div>
+        <div class="endpoint-body">
+          <pre><code class="lang-json">// Request
+{
+  "user_session": "AbCdEfGh...",
+  "device_id": "CEZmobC6SYjT1azK"
+}
+
+// Response 200
+{
+  "last_data": {
+    "device_id": "CEZmobC6SYjT1azK",
+    "temperature": 22.5,
+    "humidity": 60.1,
+    "timestamp": "2026-03-19T10:00:00"
+  }
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <code>/devices/delete</code>
+          <span class="endpoint-desc">Remove a device and its MQTT credentials</span>
+        </div>
+        <div class="endpoint-body">
+          <pre><code class="lang-json">// Request
+{
+  "user_session": "AbCdEfGh...",
+  "device_id": "CEZmobC6SYjT1azK"
+}
+
+// Response 200
+{ "message": "Device deleted successfully" }</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- DATA API -->
+    <section id="data-api">
+      <h2>Data API</h2>
+      <p>Query historical sensor readings with flexible filters, pagination, and time ranges.</p>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <code>/data/get-by-device</code>
+          <span class="endpoint-desc">Get data for a specific device with filters</span>
+        </div>
+        <div class="endpoint-body">
+          <pre><code class="lang-json">// Request
+{
+  "user_session": "AbCdEfGh...",
+  "device_id": "CEZmobC6SYjT1azK",
+  "filters": {
+    "timestamp": {
+      "$gte": "2026-03-19T00:00:00",
+      "$lte": "2026-03-19T23:59:59"
+    },
+    "temperature": { "$gt": 20 }
+  },
+  "limit": 100,
+  "offset": 0
+}
+
+// Response 200
+{
+  "message": "Data retrieved successfully",
+  "device_id": "CEZmobC6SYjT1azK",
+  "data": [
+    {
+      "_id": "...",
+      "device_id": "CEZmobC6SYjT1azK",
+      "temperature": 22.5,
+      "humidity": 60.0,
+      "timestamp": "2026-03-19T10:00:00",
+      "created_at": "2026-03-19T10:00:00"
+    }
+  ],
+  "total_count": 240,
+  "returned_count": 100,
+  "limit": 100,
+  "offset": 0
+}</code></pre>
+          <h4>Supported Filter Operators</h4>
+          <table>
+            <thead><tr><th>Operator</th><th>Meaning</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td><code>$gt</code></td><td>Greater than</td><td><code>{"temperature": {"$gt": 25}}</code></td></tr>
+              <tr><td><code>$gte</code></td><td>Greater than or equal</td><td><code>{"timestamp": {"$gte": "2026-01-01T00:00:00"}}</code></td></tr>
+              <tr><td><code>$lt</code></td><td>Less than</td><td><code>{"humidity": {"$lt": 80}}</code></td></tr>
+              <tr><td><code>$lte</code></td><td>Less than or equal</td><td><code>{"co2": {"$lte": 1000}}</code></td></tr>
+              <tr><td><code>$in</code></td><td>In list</td><td><code>{"status": {"$in": ["ok","warn"]}}</code></td></tr>
+              <tr><td>(exact)</td><td>Exact match</td><td><code>{"device_id": "CEZmobC6SYjT1azK"}</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <code>/data/stats</code>
+          <span class="endpoint-desc">Get record count and timestamp range</span>
+        </div>
+        <div class="endpoint-body">
+          <pre><code class="lang-json">// Request
+{
+  "user_session": "AbCdEfGh...",
+  "device_id": "CEZmobC6SYjT1azK"   // optional
+}
+
+// Response 200
+{
+  "stats": {
+    "total_records": 1440,
+    "latest_record_timestamp": "2026-03-19T10:00:00",
+    "oldest_record_timestamp": "2026-03-18T10:00:00"
+  }
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <code>/data/count</code>
+          <span class="endpoint-desc">Count records matching a filter</span>
+        </div>
+        <div class="endpoint-body">
+          <pre><code class="lang-json">// Request
+{
+  "user_session": "AbCdEfGh...",
+  "filters": { "temperature": { "$gt": 30 } }
+}
+
+// Response 200
+{ "count": 42 }</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- MQTT -->
+    <section id="mqtt">
+      <h2>MQTT Integration</h2>
+      <p>Connect any MQTT-capable device to EMQX using the credentials provided by <code>/devices/get</code>.</p>
+
+      <h3>Connection Details</h3>
+      <table>
+        <thead><tr><th>Protocol</th><th>Host</th><th>Port</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>MQTT (TCP)</td><td>iotlab.am</td><td>1883</td><td>Standard</td></tr>
+          <tr><td>MQTT over WS</td><td>iotlab.am</td><td>8083</td><td>WebSocket</td></tr>
+          <tr><td>MQTT over TLS</td><td>iotlab.am</td><td>8883</td><td>Secure</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Authentication</h3>
+      <pre><code class="lang-text">Username: {device_id}       e.g. CEZmobC6SYjT1azK
+Password: {device_password} e.g. q56iK4aGiY3POiLm</code></pre>
+
+      <h3>Topic Structure</h3>
+      <pre><code class="lang-text">{user_id}/{your_topic}
+
+Example: DVONBeK1zitwkwN6/sensors/temperature</code></pre>
+      <div class="callout warning">
+        <strong>Important:</strong> Always prefix your topic with your <code>user_id</code>.
+        The device ACL rules already include this prefix — publish to the full topic as returned by <code>/devices/get</code>.
+      </div>
+
+      <h3>Python Example</h3>
+      <pre><code class="lang-python">import paho.mqtt.client as mqtt
+import json, time, random
+
+BROKER   = "iotlab.am"
+PORT     = 1883
+DEVICE_ID   = "CEZmobC6SYjT1azK"
+DEVICE_PASS = "q56iK4aGiY3POiLm"
+TOPIC    = "DVONBeK1zitwkwN6/sensors/data"
+
+def on_connect(client, userdata, flags, rc):
+    print("Connected" if rc == 0 else f"Failed: {rc}")
+
+client = mqtt.Client()
+client.username_pw_set(DEVICE_ID, DEVICE_PASS)
+client.on_connect = on_connect
+client.connect(BROKER, PORT)
+client.loop_start()
+
+while True:
+    payload = {
+        "temperature": round(20 + random.uniform(0, 10), 2),
+        "humidity":    round(50 + random.uniform(0, 30), 2),
+    }
+    client.publish(TOPIC, json.dumps(payload))
+    print(f"Published: {payload}")
+    time.sleep(30)</code></pre>
+
+      <h3>Arduino / ESP32 Example</h3>
+      <pre><code class="lang-cpp">#include &lt;WiFi.h&gt;
+#include &lt;PubSubClient.h&gt;
+#include &lt;ArduinoJson.h&gt;
+
+const char* ssid     = "YOUR_WIFI";
+const char* password = "YOUR_WIFI_PASS";
+const char* mqtt_server   = "iotlab.am";
+const char* mqtt_user     = "CEZmobC6SYjT1azK";   // device_id
+const char* mqtt_password = "q56iK4aGiY3POiLm";    // device_password
+const char* topic         = "DVONBeK1zitwkwN6/sensors/data";
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void setup() {
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) delay(500);
+  client.setServer(mqtt_server, 1883);
+}
+
+void loop() {
+  if (!client.connected()) {
+    client.connect("esp32-sensor", mqtt_user, mqtt_password);
+  }
+
+  StaticJsonDocument&lt;128&gt; doc;
+  doc["temperature"] = 22.5;   // read from sensor
+  doc["humidity"]    = 60.0;
+
+  char buf[128];
+  serializeJson(doc, buf);
+  client.publish(topic, buf);
+  delay(30000);
+}</code></pre>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- DATA FORMAT -->
+    <section id="data-format">
+      <h2>Data Format</h2>
+      <p>Payload must be valid JSON. Any numeric fields are automatically detected and charted by the dashboard.</p>
+
+      <h3>Recommended Schema</h3>
+      <pre><code class="lang-json">{
+  "temperature": 22.5,
+  "humidity": 60.1,
+  "pressure": 1013.2,
+  "battery": 87
+}</code></pre>
+
+      <h3>Stored Document</h3>
+      <p>After passing through <code>mqtt_to_mongo</code>, the document stored in MongoDB looks like:</p>
+      <pre><code class="lang-json">{
+  "_id": "ObjectId(...)",
+  "device_id": "CEZmobC6SYjT1azK",
+  "temperature": 22.5,
+  "humidity": 60.1,
+  "topic": "DVONBeK1zitwkwN6/sensors/data",
+  "timestamp": "ISODate(...)",
+  "created_at": "ISODate(...)"
+}</code></pre>
+
+      <div class="callout info">
+        <strong>Flexible schema:</strong> You can send any JSON fields — the dashboard auto-discovers all numeric fields and renders them as charts. No configuration needed.
+      </div>
+
+      <h3>Field Rules</h3>
+      <table>
+        <thead><tr><th>Field</th><th>Added by</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>device_id</code></td><td>mqtt_to_mongo</td><td>Second segment of MQTT topic</td></tr>
+          <tr><td><code>topic</code></td><td>mqtt_to_mongo</td><td>Full MQTT topic</td></tr>
+          <tr><td><code>created_at</code></td><td>mqtt_to_mongo</td><td>UTC time of ingestion</td></tr>
+          <tr><td><code>timestamp</code></td><td>mqtt_to_mongo</td><td>Same as created_at (UTC)</td></tr>
+          <tr><td>custom fields</td><td>your device</td><td>Any JSON values you publish</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard">
+      <h2>Dashboard</h2>
+      <p>The dashboard at <a href="https://dashboard.iotlab.am" target="_blank">dashboard.iotlab.am</a> is a read-only public interface — no login required.</p>
+
+      <h3>Features</h3>
+      <ul>
+        <li><strong>Device sidebar</strong> — lists all registered devices, click to switch</li>
+        <li><strong>Stat cards</strong> — total records, in-range count, sensor field count, last data time</li>
+        <li><strong>Latest readings</strong> — current value of every numeric sensor field</li>
+        <li><strong>Sensor charts</strong> — line charts for all numeric fields, auto-grouped</li>
+        <li><strong>Time range filter</strong> — 1H / 6H / 24H / 7D</li>
+        <li><strong>Auto-refresh</strong> — updates every 30 seconds automatically</li>
+        <li><strong>Data table</strong> — last 50 raw records per device</li>
+      </ul>
+
+      <h3>Rebuilding the Dashboard</h3>
+      <p>If you change credentials or need to rebuild:</p>
+      <pre><code class="lang-bash">cd /root/github/iot-dashboard
+DASHBOARD_USER=youruser DASHBOARD_PASS=yourpass \
+  docker compose up -d --build</code></pre>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- SIMULATOR -->
+    <section id="simulator">
+      <h2>Simulator</h2>
+      <p>The <code>iot-simulator</code> service generates realistic sensor readings every 15 seconds, useful for testing the dashboard without physical hardware.</p>
+
+      <h3>What it generates</h3>
+      <div class="cards-grid two-col">
+        <div class="card">
+          <h3>Climate Sensor</h3>
+          <ul>
+            <li><code>temperature</code> — 20–25°C, sinusoidal drift</li>
+            <li><code>humidity</code> — 50–65%, inverse wave</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Air Quality Sensor</h3>
+          <ul>
+            <li><code>co2</code> — 350–500 ppm</li>
+            <li><code>pm25</code> — 5–15 µg/m³</li>
+            <li><code>voc</code> — 80–180 ppb</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Configuration</h3>
+      <p>Edit <code>docker-compose.yml</code> in <code>/root/github/iot-simulator/</code>:</p>
+      <pre><code class="lang-yaml">environment:
+  MONGO_URI: mongodb://user:pass@host:27017
+  USER_ID: DVONBeK1zitwkwN6          # your user_id
+  CLIMATE_DEVICE_ID: CEZmobC6SYjT1azK
+  AIR_QUALITY_DEVICE_ID: ALJYrp3KeDaVO7Cl
+  INTERVAL: "15"                      # seconds between readings</code></pre>
+
+      <h3>Commands</h3>
+      <pre><code class="lang-bash"># Start
+cd /root/github/iot-simulator && docker compose up -d
+
+# View live output
+docker logs iot-simulator -f
+
+# Stop
+docker compose down</code></pre>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- DEPLOYMENT -->
+    <section id="deployment">
+      <h2>Deployment</h2>
+      <p>All services are deployed on a single Debian server at <code>10.10.10.103</code> using Docker Compose.</p>
+
+      <h3>Directory Structure</h3>
+      <pre><code class="lang-text">/root/
+├── github/
+│   ├── main_api/          # REST API (Flask)
+│   ├── mqtt_to_mongo/     # MQTT→MongoDB bridge
+│   ├── frontend/          # (legacy frontend)
+│   ├── iot-dashboard/     # React dashboard
+│   ├── iot-simulator/     # Data simulator
+│   └── iot-docs/          # This documentation
+├── env/
+│   ├── .main_api.env      # API environment variables
+│   └── .mqtt_to_mongo.env # Bridge environment variables
+└── docker-files/
+    └── mongo.yaml         # MongoDB compose file</code></pre>
+
+      <h3>Environment Variables</h3>
+      <h4>.main_api.env</h4>
+      <pre><code class="lang-bash">MONGO_URI=mongodb://user:pass@host:27017
+EMQX_API_KEY=your_key
+EMQX_API_SECRET=your_secret
+EMQX_API_URL=http://host.docker.internal:18083</code></pre>
+
+      <h4>.mqtt_to_mongo.env</h4>
+      <pre><code class="lang-bash">MQTT_API=host.docker.internal
+MQTT_PORT=1883
+MQTT_USER=your_mqtt_user
+MQTT_PASS=your_mqtt_pass
+MONGO_URI=mongodb://user:pass@host:27017</code></pre>
+
+      <h3>Common Commands</h3>
+      <pre><code class="lang-bash"># Restart any service
+cd /root/github/main_api && docker compose restart
+
+# Rebuild after code changes
+docker compose up -d --build
+
+# View logs
+docker logs main_api -f
+docker logs iot-simulator -f
+docker logs iot-dashboard -f
+
+# List all running containers
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"</code></pre>
+
+      <h3>GitHub Repositories</h3>
+      <table>
+        <thead><tr><th>Repo</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://github.com/IotEagle/main_api" target="_blank">IotEagle/main_api</a></td><td>REST API</td></tr>
+          <tr><td><a href="https://github.com/IotEagle/iot-dashboard" target="_blank">IotEagle/iot-dashboard</a></td><td>React dashboard</td></tr>
+          <tr><td><a href="https://github.com/IotEagle/iot-simulator" target="_blank">IotEagle/iot-simulator</a></td><td>Data simulator</td></tr>
+          <tr><td><a href="https://github.com/IotEagle/iot-docs" target="_blank">IotEagle/iot-docs</a></td><td>Documentation</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="footer">
+      <p>IotEagle Platform · Built with ❤️ · <a href="https://github.com/IotEagle" target="_blank">GitHub</a></p>
+    </div>
+
+  </div>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
